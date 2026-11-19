@@ -1,0 +1,552 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rascademy — Platform Belajar Matematika Berbasis Konsep</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for LaTeX Mathematical Notation -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      /* Base Obsidian, Molten Amber & Warm Alabaster Palette */
+      --bg-outer: #030201;
+      --bg-app: #090604;
+      --surface-card: linear-gradient(180deg, rgba(26, 15, 9, 0.92) 0%, rgba(15, 9, 5, 0.96) 100%);
+      --surface-subcard: rgba(14, 9, 6, 0.78);
+      --surface-input: #110A06;
+
+      --amber-500: #F97316;
+      --amber-400: #FB923C;
+      --gold-400: #FBBF24;
+      --gold-200: #FDE6C4;
+
+      --accent-gradient: linear-gradient(135deg, #F97316 0%, #EA580C 55%, #D97706 100%);
+      --progress-gradient: linear-gradient(90deg, #EA580C 0%, #F97316 55%, #FBBF24 100%);
+
+      /* Dynamic Ambis Flame Intensity Variables (Escalates as missions are completed) */
+      --shell-border: rgba(249, 115, 22, 0.16);
+      --shell-glow: 0 0 60px rgba(0, 0, 0, 0.9);
+      --ambient-top: rgba(249, 115, 22, 0.10);
+      --ambient-mid: rgba(217, 119, 6, 0.06);
+      --ambient-bot: rgba(234, 88, 12, 0.08);
+      --border-subtle: rgba(245, 158, 11, 0.20);
+      --border-glow: rgba(251, 146, 60, 0.45);
+      --border-strong: rgba(251, 191, 36, 0.72);
+      --glow-card: 0 6px 24px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(253, 230, 196, 0.06);
+      --glow-active: 0 0 22px rgba(249, 115, 22, 0.24), inset 0 1px 0 rgba(251, 191, 36, 0.14);
+      --glow-btn: 0 4px 18px rgba(249, 115, 22, 0.42);
+
+      /* Cohesive Typography Colors */
+      --text-primary: #FAF5EE;
+      --text-secondary: #C9B8A8;
+      --text-muted: #8C7A6B;
+
+      /* Semantic Colors */
+      --success: #4ADE80;
+      --success-bg: rgba(74, 222, 128, 0.10);
+      --success-border: rgba(74, 222, 128, 0.34);
+
+      --error: #F87171;
+      --error-bg: rgba(248, 113, 113, 0.10);
+      --error-border: rgba(248, 113, 113, 0.34);
+
+      --concept-bg: rgba(249, 115, 22, 0.12);
+      --concept-border: rgba(251, 191, 36, 0.36);
+
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* Hardware-Accelerated Foreground Rim-Fire Canvas (Strictly hugs dock & outer edges, never covers text) */
+    #foreground-fire-canvas {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      pointer-events: none;
+      z-index: 45;
+    }
+
+    /* ==========================================================================
+       CUMULATIVE AMBIS FLAME TIERS (0 = Stealth Obsidian -> 5 = Molten Flagship Rim)
+       High-contrast OLED obsidian surface + precision edge lighting (zero text washout)
+       ========================================================================== */
+    #app-shell.flame-tier-0 {
+      --bg-app: #070504;
+      --shell-border: rgba(249, 115, 22, 0.16);
+      --shell-glow: 0 0 50px rgba(0, 0, 0, 0.92);
+      --ambient-top: rgba(249, 115, 22, 0.06);
+      --ambient-mid: rgba(217, 119, 6, 0.03);
+      --ambient-bot: rgba(234, 88, 12, 0.05);
+      --border-subtle: rgba(245, 158, 11, 0.18);
+      --border-glow: rgba(251, 146, 60, 0.36);
+      --glow-card: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 245, 235, 0.05);
+      --glow-active: 0 0 18px rgba(249, 115, 22, 0.18), inset 0 1px 0 rgba(251, 191, 36, 0.12);
+    }
+
+    #app-shell.flame-tier-1 {
+      --bg-app: #080604;
+      --shell-border: rgba(249, 115, 22, 0.36);
+      --shell-glow: 0 0 55px rgba(249, 115, 22, 0.18);
+      --ambient-top: rgba(249, 115, 22, 0.12);
+      --ambient-mid: rgba(234, 88, 12, 0.06);
+      --ambient-bot: rgba(217, 119, 6, 0.10);
+      --border-subtle: rgba(249, 115, 22, 0.28);
+      --border-glow: rgba(251, 146, 60, 0.56);
+      --glow-card: 0 8px 26px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(253, 230, 196, 0.10);
+      --glow-active: 0 0 24px rgba(249, 115, 22, 0.28), inset 0 1px 0 rgba(251, 191, 36, 0.22);
+    }
+
+    #app-shell.flame-tier-2 {
+      --bg-app: #090604;
+      --shell-border: rgba(251, 146, 60, 0.55);
+      --shell-glow: 0 0 65px rgba(249, 115, 22, 0.26);
+      --ambient-top: rgba(249, 115, 22, 0.16);
+      --ambient-mid: rgba(245, 158, 11, 0.08);
+      --ambient-bot: rgba(234, 88, 12, 0.14);
+      --border-subtle: rgba(251, 146, 60, 0.36);
+      --border-glow: rgba(251, 191, 36, 0.68);
+      --glow-card: 0 8px 28px rgba(0, 0, 0, 0.65), 0 0 16px rgba(249, 115, 22, 0.08), inset 0 1px 0 rgba(251, 191, 36, 0.16);
+      --glow-active: 0 0 28px rgba(249, 115, 22, 0.36), inset 0 1px 0 rgba(251, 191, 36, 0.28);
+    }
+
+    #app-shell.flame-tier-3 {
+      --bg-app: #0A0705;
+      --shell-border: rgba(251, 191, 36, 0.72);
+      --shell-glow: 0 0 75px rgba(249, 115, 22, 0.34);
+      --ambient-top: rgba(251, 146, 60, 0.20);
+      --ambient-mid: rgba(249, 115, 22, 0.10);
+      --ambient-bot: rgba(251, 191, 36, 0.18);
+      --border-subtle: rgba(251, 191, 36, 0.44);
+      --border-glow: rgba(251, 191, 36, 0.80);
+      --glow-card: 0 8px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(249, 115, 22, 0.12), inset 0 1px 0 rgba(253, 230, 196, 0.22);
+      --glow-active: 0 0 34px rgba(251, 146, 60, 0.44), inset 0 1px 0 rgba(253, 230, 196, 0.34);
+    }
+
+    #app-shell.flame-tier-4 {
+      --bg-app: #0B0705;
+      --shell-border: rgba(253, 224, 71, 0.86);
+      --shell-glow: 0 0 88px rgba(251, 146, 60, 0.44);
+      --ambient-top: rgba(251, 191, 36, 0.24);
+      --ambient-mid: rgba(249, 115, 22, 0.12);
+      --ambient-bot: rgba(251, 191, 36, 0.22);
+      --border-subtle: rgba(253, 224, 71, 0.52);
+      --border-glow: rgba(253, 224, 71, 0.90);
+      --glow-card: 0 10px 32px rgba(0, 0, 0, 0.65), 0 0 24px rgba(251, 146, 60, 0.16), inset 0 1px 0 rgba(255, 251, 235, 0.28);
+      --glow-active: 0 0 40px rgba(251, 191, 36, 0.54), inset 0 1px 0 rgba(255, 251, 235, 0.42);
+    }
+
+    #app-shell.flame-tier-5 {
+      --bg-app: #0C0805;
+      --shell-border: #FDE047;
+      --shell-glow: 0 0 100px rgba(251, 191, 36, 0.55);
+      --ambient-top: rgba(253, 224, 71, 0.28);
+      --ambient-mid: rgba(249, 115, 22, 0.15);
+      --ambient-bot: rgba(251, 191, 36, 0.26);
+      --border-subtle: rgba(253, 224, 71, 0.62);
+      --border-glow: #FEF08A;
+      --glow-card: 0 10px 34px rgba(0, 0, 0, 0.65), 0 0 28px rgba(251, 191, 36, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+      --glow-active: 0 0 46px rgba(253, 224, 71, 0.64), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    }
+
+    /* ==========================================================================
+       CUMULATIVE AMBIS FLAME TIERS (0 = Calm -> 5 = Blazing Inferno)
+       Each completed mission upgrades the entire UI illumination!
+       ========================================================================== */
+    #app-shell.flame-tier-0 {
+      --bg-app: #080604;
+      --shell-border: rgba(249, 115, 22, 0.14);
+      --shell-glow: 0 0 50px rgba(0, 0, 0, 0.9);
+      --ambient-top: rgba(249, 115, 22, 0.07);
+      --ambient-mid: rgba(217, 119, 6, 0.04);
+      --ambient-bot: rgba(234, 88, 12, 0.05);
+      --border-subtle: rgba(245, 158, 11, 0.16);
+      --border-glow: rgba(251, 146, 60, 0.34);
+      --glow-card: 0 6px 22px rgba(0, 0, 0, 0.6);
+      --glow-active: 0 0 16px rgba(249, 115, 22, 0.16);
+    }
+
+    #app-shell.flame-tier-1 {
+      --bg-app: #0B0704;
+      --shell-border: rgba(249, 115, 22, 0.34);
+      --shell-glow: 0 0 55px rgba(249, 115, 22, 0.16);
+      --ambient-top: rgba(249, 115, 22, 0.18);
+      --ambient-mid: rgba(234, 88, 12, 0.10);
+      --ambient-bot: rgba(217, 119, 6, 0.14);
+      --border-subtle: rgba(249, 115, 22, 0.28);
+      --border-glow: rgba(251, 146, 60, 0.56);
+      --glow-card: 0 6px 26px rgba(249, 115, 22, 0.09), inset 0 1px 0 rgba(253, 230, 196, 0.08);
+      --glow-active: 0 0 26px rgba(249, 115, 22, 0.32), inset 0 1px 0 rgba(251, 191, 36, 0.18);
+    }
+
+    #app-shell.flame-tier-2 {
+      --bg-app: #0F0905;
+      --shell-border: rgba(251, 146, 60, 0.52);
+      --shell-glow: 0 0 70px rgba(249, 115, 22, 0.26);
+      --ambient-top: rgba(249, 115, 22, 0.26);
+      --ambient-mid: rgba(245, 158, 11, 0.15);
+      --ambient-bot: rgba(234, 88, 12, 0.20);
+      --border-subtle: rgba(251, 146, 60, 0.38);
+      --border-glow: rgba(251, 191, 36, 0.68);
+      --glow-card: 0 6px 28px rgba(249, 115, 22, 0.15), inset 0 1px 0 rgba(251, 191, 36, 0.12);
+      --glow-active: 0 0 32px rgba(249, 115, 22, 0.42), inset 0 1px 0 rgba(251, 191, 36, 0.24);
+    }
+
+    #app-shell.flame-tier-3 {
+      --bg-app: #140B06;
+      --shell-border: rgba(251, 191, 36, 0.68);
+      --shell-glow: 0 0 85px rgba(249, 115, 22, 0.36);
+      --ambient-top: rgba(251, 146, 60, 0.34);
+      --ambient-mid: rgba(249, 115, 22, 0.22);
+      --ambient-bot: rgba(251, 191, 36, 0.26);
+      --border-subtle: rgba(251, 191, 36, 0.48);
+      --border-glow: rgba(251, 191, 36, 0.82);
+      --glow-card: 0 8px 32px rgba(249, 115, 22, 0.22), inset 0 1px 0 rgba(253, 230, 196, 0.16);
+      --glow-active: 0 0 38px rgba(251, 146, 60, 0.52), inset 0 1px 0 rgba(253, 230, 196, 0.30);
+    }
+
+    #app-shell.flame-tier-4 {
+      --bg-app: #190E07;
+      --shell-border: rgba(253, 224, 71, 0.82);
+      --shell-glow: 0 0 100px rgba(251, 146, 60, 0.48);
+      --ambient-top: rgba(251, 191, 36, 0.42);
+      --ambient-mid: rgba(249, 115, 22, 0.28);
+      --ambient-bot: rgba(251, 191, 36, 0.34);
+      --border-subtle: rgba(253, 224, 71, 0.58);
+      --border-glow: rgba(253, 224, 71, 0.92);
+      --glow-card: 0 8px 36px rgba(251, 146, 60, 0.30), inset 0 1px 0 rgba(255, 251, 235, 0.22);
+      --glow-active: 0 0 46px rgba(251, 191, 36, 0.65), inset 0 1px 0 rgba(255, 251, 235, 0.38);
+    }
+
+    #app-shell.flame-tier-5 {
+      --bg-app: #1F1108;
+      --shell-border: #FDE047;
+      --shell-glow: 0 0 120px rgba(251, 191, 36, 0.62);
+      --ambient-top: rgba(253, 224, 71, 0.50);
+      --ambient-mid: rgba(249, 115, 22, 0.34);
+      --ambient-bot: rgba(251, 191, 36, 0.42);
+      --border-subtle: rgba(253, 224, 71, 0.72);
+      --border-glow: #FEF08A;
+      --glow-card: 0 10px 40px rgba(251, 191, 36, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      --glow-active: 0 0 54px rgba(253, 224, 71, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-outer);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Main Responsive App Shell */
+    #app-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg-app);
+      background-image:
+        radial-gradient(circle at 85% 10%, var(--ambient-top) 0%, transparent 48%),
+        radial-gradient(circle at 12% 48%, var(--ambient-mid) 0%, transparent 52%),
+        radial-gradient(circle at 75% 88%, var(--ambient-bot) 0%, transparent 52%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--shell-border);
+      border-right: 1px solid var(--shell-border);
+      box-shadow: var(--shell-glow);
+      transition: background-color 0.6s ease, box-shadow 0.6s ease, border-color 0.6s ease;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Rising Embers inside App Shell (Scales with Ambis Flame Level) */
+    #ambient-ember-canvas {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .text-display { font-size: 1.42rem; font-weight: 800; line-height: 1.22; color: var(--text-primary); }
+    .text-heading { font-size: 1.06rem; font-weight: 700; line-height: 1.32; color: var(--text-primary); }
+    .text-subheading { font-size: 0.91rem; font-weight: 600; line-height: 1.38; color: var(--text-primary); }
+    .text-body { font-size: 0.84rem; color: var(--text-secondary); }
+    .text-caption { font-size: 0.74rem; color: var(--text-muted); }
+    .text-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold-400); }
+
+    /* ==========================================================================
+       1. SPLASH SCREEN
+       ========================================================================== */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #050302;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #splash-fire-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .splash-center-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .rascademy-logo-glow {
+      width: 104px;
+      height: 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 0 24px rgba(249, 115, 22, 0.7));
+      animation: logoFloat 2.2s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.03); }
+    }
+
+    .splash-loader-track {
+      width: 150px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .splash-loader-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--progress-gradient);
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.85);
+      animation: loadSplash 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes loadSplash {
+      to { width: 100%; }
+    }
+
+    /* ==========================================================================
+       2. MISSION FLAME IGNITION CELEBRATION OVERLAY
+       ========================================================================== */
+    #mission-flame-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: rgba(5, 3, 2, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeInOverlay 0.25s ease forwards;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #mission-flame-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .flame-celebration-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 390px;
+      background: linear-gradient(165deg, rgba(42, 22, 10, 0.96) 0%, rgba(16, 9, 5, 0.98) 100%);
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 26px 22px;
+      text-align: center;
+      box-shadow: 0 0 56px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(253, 230, 196, 0.22);
+      animation: popFlameCard 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes popFlameCard {
+      from { opacity: 0; transform: translateY(16px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .flame-medallion {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 14px auto;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 40%, rgba(253, 224, 71, 0.38), rgba(249, 115, 22, 0.16) 65%, transparent 100%);
+      border: 1.5px solid var(--gold-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 34px rgba(249, 115, 22, 0.72);
+      animation: flamePulseAura 1.6s ease-in-out infinite;
+    }
+
+    @keyframes flamePulseAura {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 26px rgba(249, 115, 22, 0.58); }
+      50% { transform: scale(1.07); box-shadow: 0 0 42px rgba(253, 224, 71, 0.9); }
+    }
+
+    /* ==========================================================================
+       3. TOP BAR HEADER
+       ========================================================================== */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(10, 6, 4, 0.86);
+      backdrop-filter: blur(12px);
+      padding: 14px 18px 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(249, 115, 22, 0.10);
+    }
+
+    .user-header-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .circle-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(36, 20, 11, 0.92);
+      border: 1px solid var(--border-subtle);
+      color: var(--amber-400);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.16s ease;
+    }
+
+    .circle-icon-btn:hover {
+      border-color: var(--border-glow);
+      box-shadow: var(--glow-active);
+      color: #FFFBF7;
+    }
+
+    .ambis-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: var(--radius-pill);
+      background: rgba(42, 22, 10, 0.94);
+      border: 1px solid var(--border-glow);
+      font-family: var(--font-display);
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--gold-400);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--glow-active);
+    }
+
+    .ambis-pill:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       4. MAIN VIEWPORT & CARDS
+       ========================================================================== */
+    #main-content {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      padding: 10px 16px 96px 16px;
+      overflow-y: auto;
+    }
+
+    .ember-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--glow-card);
+      transition: border-color 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .ember-card-glow {
+      position: relative;
+      background: linear-gradient(165deg, rgba(32, 18, 10, 0.96) 0%, rgba(14, 9, 6, 0.98) 100%);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg)
